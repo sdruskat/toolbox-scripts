@@ -32,11 +32,23 @@ gen_m = raw_input("Please type the marker used for genre [\\gn]: ") or "gn"
 syn_m = raw_input("Please type the marker"
                   " used for synopsis [\\syn]: ") or "syn"
 
+# Create an output directory, which is the sibling
+# of the current working directory,
+# called "genre-synposis-extraction"
+cwd = os.path.dirname(os.getcwd())
+par = os.path.dirname(cwd)
+outdir = os.path.join(par, "analysis", "genre-synposis-extraction")
+if not os.path.exists(outdir):
+    os.makedirs(outdir)
+
+# Compile the name of the output file
+outfilename = cwd.rsplit(os.path.sep, 1)[1] + ".csv"
+
+# Create the var and header for the CSV file
+outcsv = "File$ID$Genre$Synopsis"
+
 # Go through all files in the current workin directory
 for f in os.listdir(os.getcwd()):
-
-    # Create the header for the CSV file
-    outcsv = "File$ID$Genre$Synopsis"
 
     # Open the file
     with open(f) as fi:
@@ -74,6 +86,8 @@ for f in os.listdir(os.getcwd()):
             if line.startswith("\\%s" % doc_m):
                 if doc != "" and (syn != " " or gen != " "):
                     outcsv = "%s\n%s$%s$%s$%s" % (outcsv, f, doc, gen, syn)
+                    gen = " "
+                    syn = " "
                 doc = line.strip()
                 doc = doc[len("\\%s" % doc_m):].strip()
                 concat_to = "id"
@@ -86,13 +100,12 @@ for f in os.listdir(os.getcwd()):
                 syn = syn[len("\\%s" % syn_m):].strip()
                 concat_to = "syn"
     print "Done, writing file"
-    # Write the CSV string to file
-    to_file = "%s_genre-syopsis.csv" % str(f).rsplit(".", 1)[0]
-    out_file = open(to_file, 'w')
-    out_file.write(outcsv)
-    outcsv = ""
-    print "Done writing file"
-    print "Filename:", to_file
+
+# Write the CSV string to file
+out_file = open(os.path.join(outdir, outfilename), 'w')
+out_file.write(outcsv)
+print "Done writing file"
+print "Filename:", outdir + os.path.sep + outfilename
 
 print ("In order to open the file with a spreadsheet application,"
        "use the dollar sign ('$') as separator.")
