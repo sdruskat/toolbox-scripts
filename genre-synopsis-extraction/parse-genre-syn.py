@@ -53,21 +53,25 @@ for f in os.listdir(os.getcwd()):
     # Open the file
     with open(f) as fi:
         doc = ""
-        syn = ""
-        gen = ""
+        syn = " "
+        gen = " "
         concat_to = ""
 
         print "Processing", f
         # For each line in the file
         for line in fi:
             # Clear any trailing whitespaces
-            line = line.strip()
+            line.strip()
+            # Convert any line breaks to Unix (\n)
+            line = line.replace('\r\n', '\n')
+            line = line.replace('\r', '\n')
+
             # The next line is always a candidate for concatenation (i.e.,
             # it might contain content that could belong to the line before),
             # so check if it starts with a backslash, and if it does not,
             # concatenate the string variable of the line before with
             # the contents of this line, else, reset the variable.
-            if not line.startswith("\\"):
+            if not (line.startswith("\\") or line.startswith("\n")):
                 if concat_to == "gen":
                     gen = gen + " " + line
                 elif concat_to == "syn":
@@ -99,12 +103,21 @@ for f in os.listdir(os.getcwd()):
                 syn = line.strip()
                 syn = syn[len("\\%s" % syn_m):].strip()
                 concat_to = "syn"
-    print "Done, writing file"
+        # At this point, check whether the contents of doc, gen, and syn have
+        # already been written to outcsv, as it will not have happened if the
+        # file only contained one single \id.
+        index_last_lb = outcsv.rfind("\n")
+        if outcsv[index_last_lb:] != "%s$%s$%s$%s" % (f, doc, gen, syn):
+            if doc != "" and (syn != " " or gen != " "):
+                outcsv = "%s\n%s$%s$%s$%s" % (outcsv, f, doc, gen, syn)
+                gen = " "
+                syn = " "
+        print "Finished processing", f
 
 # Write the CSV string to file
 out_file = open(os.path.join(outdir, outfilename), 'w')
 out_file.write(outcsv)
-print "Done writing file"
+print "Done!"
 print "Filename:", outdir + os.path.sep + outfilename
 
 print ("In order to open the file with a spreadsheet application,"
