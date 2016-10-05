@@ -34,10 +34,10 @@ syn_m = raw_input("Please type the marker"
 
 # Create an output directory, which is the sibling
 # of the current working directory,
-# called "genre-synposis-extraction"
+# called "genre-synopsis-extraction"
 cwd = os.path.dirname(os.getcwd())
 par = os.path.dirname(cwd)
-outdir = os.path.join(par, "analysis", "genre-synposis-extraction")
+outdir = os.path.join(par, "analysis", "genre-synopsis-extraction")
 if not os.path.exists(outdir):
     os.makedirs(outdir)
 
@@ -46,6 +46,9 @@ outfilename = cwd.rsplit(os.path.sep, 1)[1] + ".csv"
 
 # Create the var and header for the CSV file
 outcsv = "File$ID$Genre$Synopsis"
+
+# Numer of occurrences of the \syn marker, for sanity check
+syn_occ = 0
 
 # Go through all files in the current workin directory
 for f in os.listdir(os.getcwd()):
@@ -57,7 +60,7 @@ for f in os.listdir(os.getcwd()):
         gen = " "
         concat_to = ""
 
-        print "Processing", f
+        print "\n##########\n\nProcessing", f
         # For each line in the file
         for line in fi:
             # Clear any trailing whitespaces
@@ -115,16 +118,16 @@ for f in os.listdir(os.getcwd()):
         # Quick sanity check
         # NOTE: Not reliable (No. of \id with just
         # either \syn or \gn may differ)
-        syn_occ = open(f).read().count("\%s" % syn_m)
-        if syn_occ == outcsv.count("\n") - 1:
+        syn_occ += open(f).read().count("\%s" % syn_m)
+        if syn_occ == outcsv.count("\n"):
             print "Sanity check passed"
         print "Finished processing", f
 
 # Write the CSV string to file
 out_file = open(os.path.join(outdir, outfilename), 'w')
 out_file.write(outcsv)
-print "Done!"
+print "\n#####\n\nDone!"
 print "Filename:", outdir + os.path.sep + outfilename
 
 print ("In order to open the file with a spreadsheet application,"
-       "use the dollar sign ('$') as separator.")
+       "use the dollar sign ('$') as separator.\n")
