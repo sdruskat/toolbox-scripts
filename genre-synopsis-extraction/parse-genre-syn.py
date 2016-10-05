@@ -112,6 +112,12 @@ for f in os.listdir(os.getcwd()):
                 outcsv = "%s\n%s$%s$%s$%s" % (outcsv, f, doc, gen, syn)
                 gen = " "
                 syn = " "
+        # Quick sanity check
+        # NOTE: Not reliable (No. of \id with just
+        # either \syn or \gn may differ)
+        syn_occ = open(f).read().count("\%s" % syn_m)
+        if syn_occ == outcsv.count("\n") - 1:
+            print "Sanity check passed"
         print "Finished processing", f
 
 # Write the CSV string to file
