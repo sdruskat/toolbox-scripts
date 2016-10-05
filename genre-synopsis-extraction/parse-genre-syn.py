@@ -73,11 +73,11 @@ for f in os.listdir(os.getcwd()):
             # the contents of this line, else, reset the variable.
             if not (line.startswith("\\") or line.startswith("\n")):
                 if concat_to == "gen":
-                    gen = gen + " " + line
+                    gen = gen + " " + line.replace("\n", " ")
                 elif concat_to == "syn":
-                    syn = syn + " " + line
+                    syn = syn + " " + line.replace("\n", " ")
                 elif concat_to == "id":
-                    doc = doc + " " + line
+                    doc = doc + " " + line.replace("\n", " ")
             else:
                 concat_to = ""
             # If the line contains the \id marker,
