@@ -6,3 +6,4 @@ Unless otherwise noted (e.g., in the file header or the LICENSE file contained i
 ## Scripts
 
 - [genre-synopsis-extraction](genre-synopsis-extraction) parses a Toolbox text file, and extracts information pertaining to the genre and synopsis of documents, which is then written into a CSV file.
+- [marker-extraction](marker-extraction) parses a directory recursively, retrieves the markers from Toolbox text files contained under the directory, and writes them into a CSV file.
