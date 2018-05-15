@@ -39,8 +39,11 @@ def main():
     if toolbox_ext is "":
         toolbox_ext = "txt"
     candidates = retrieve_candidates(dir_str, toolbox_ext, toolbox_dir)
-    language_markers = retrieve_markers(dir_str, candidates)
-    write_csv(language_markers)
+    marker_tuple = retrieve_markers(dir_str, candidates)
+    language_markers = marker_tuple[0]
+    all_markers = marker_tuple[1]
+    write_csv(language_markers, all_markers)
+    print(len(all_markers))
     print("Goodbye.")
 
 
@@ -74,6 +77,7 @@ def retrieve_markers(dir_str, candidates):
     corpus language) as key, and a set of markers as value.
     """
     marker_dict = defaultdict(set)
+    all_markers = set()
     # The marker regex: At the start of the string, match a backslash
     # then more than one Unicode word, then a string.
     marker = re.compile("^\\\\[\w\[\]_]+\s")
@@ -104,16 +108,19 @@ def retrieve_markers(dir_str, candidates):
             for line in buf:
                 matches = re.match(marker, line)
                 if matches:
-                    marker_dict[language_str].add(matches.group(0)[:-1])
-    return marker_dict
+                    match = matches.group(0)[:-1]
+                    all_markers.add(match)
+                    marker_dict[language_str].add(match)
+    return (marker_dict, all_markers)
 
 
-def write_csv(markers):
+def write_csv(markers, all_markers):
     """
     Write a CSV file with rows that contain the key of the set, i.e.,
     the language name, and a sorted list representation of the set
     containing the markers.
     """
+    sorted_markers = sorted(list(all_markers))
     csv_dir = input("Directory to save the CSV file to: ")
     if not csv_dir.endswith("/"):
         csv_dir = csv_dir + "/"
@@ -121,9 +128,16 @@ def write_csv(markers):
         w = csv.writer(f)
         keys = list(markers)
         for key in keys:
-            vals = sorted(list(markers[key]))
-            vals.insert(0, key)
-            w.writerow(vals)
+            # Construct a list of markers that are actually in the
+            # set used for the language
+            val_list = []
+            for all_key in sorted_markers:
+                if all_key in markers[key]:
+                    val_list.append(all_key)
+                else:
+                    val_list.append("")
+            val_list.insert(0, key)
+            w.writerow(val_list)
 
 
 if __name__ == '__main__':
