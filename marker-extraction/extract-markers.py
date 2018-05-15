@@ -76,7 +76,7 @@ def retrieve_markers(dir_str, candidates):
     marker_dict = defaultdict(set)
     # The marker regex: At the start of the string, match a backslash
     # then more than one Unicode word, then a string.
-    marker = re.compile("^\\\\\w+\s")
+    marker = re.compile("^\\\\[\w\[\]_]+\s")
     # Get the name of the parent directory
     root_split = dir_str.rsplit("/")
     parent_name = ""
